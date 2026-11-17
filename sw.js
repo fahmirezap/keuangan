@@ -3,7 +3,7 @@
    - Aplikasi tetap terbuka walau offline
    - Ganti VERSION setiap kali file aplikasi diperbarui
    ============================================================ */
-const VERSION = 'kk-v1.1.0';
+const VERSION = 'kk-v1.1.1';
 const ASSETS = [
   './', './index.html', './styles.css', './app.js', './manifest.webmanifest',
   './icons/icon-180.png', './icons/icon-192.png', './icons/icon-512.png',
