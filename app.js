@@ -80,7 +80,9 @@ function dayLabel(isoStr) {
 const newId = () => 'tx_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8).padEnd(6, '0');
 
 /* ---------------- Ikon kategori ---------------- */
+const UNCAT = 'Belum dikategorikan';
 const EMOJI = [
+  [/belum dikategorikan/i, '🏷️'],
   [/makan|minum|kuliner|kopi|resto|jajan|food/i, '🍜'], [/transport|bensin|ojek|parkir|tol|bbm|grab|gojek/i, '🛵'],
   [/belanja|shopping|groceries/i, '🛍️'], [/tagihan|listrik|pln|pdam|\bair\b/i, '🧾'], [/pulsa|internet|wifi|kuota/i, '📶'],
   [/hiburan|nonton|game|film|langganan|streaming/i, '🎬'], [/kesehatan|obat|dokter|klinik|bpjs/i, '💊'],
@@ -422,6 +424,11 @@ function renderHome() {
   $('#sumIn').textContent = rp(s.in);
   $('#sumOut').textContent = rp(s.out);
   renderInsights($('#insightsHome'), buildInsights(false));
+
+  const uncat = list.filter((t) => t.category === UNCAT).length;
+  const notice = $('#uncatNotice');
+  notice.hidden = !uncat;
+  if (uncat) notice.innerHTML = `<span aria-hidden="true">🏷️</span><span><b>${uncat} transaksi</b> belum dikategorikan</span><span class="n-go">Rapikan ›</span>`;
 
   const recent = $('#recentList');
   if (!state.loaded && !list.length) {
@@ -1035,6 +1042,10 @@ function bindEvents() {
   window.addEventListener('scroll', hideTooltip, { passive: true });
 
   $('#fab').addEventListener('click', () => openTxForm());
+  $('#uncatNotice').addEventListener('click', () => {
+    state.hist = { q: '', type: 'all', cat: UNCAT, from: '', to: '', limit: 60 };
+    go('history');
+  });
 
   // Form
   $('#txForm').addEventListener('submit', submitTx);
