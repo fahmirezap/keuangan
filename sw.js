@@ -3,14 +3,17 @@
    - Aplikasi tetap terbuka walau offline
    - Ganti VERSION setiap kali file aplikasi diperbarui
    ============================================================ */
-const VERSION = 'kk-v1.1.1';
+const VERSION = 'kk-v1.1.2';
 const ASSETS = [
   './', './index.html', './styles.css', './app.js', './manifest.webmanifest',
   './icons/icon-180.png', './icons/icon-192.png', './icons/icon-512.png',
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(VERSION).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  // cache: 'reload' → selalu ambil dari server, bukan dari cache browser yang mungkin basi
+  e.waitUntil(caches.open(VERSION)
+    .then((c) => c.addAll(ASSETS.map((u) => new Request(u, { cache: 'reload' }))))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (e) => {
@@ -44,7 +47,7 @@ self.addEventListener('fetch', (e) => {
     const cache = await caches.open(VERSION);
     try {
       const res = await Promise.race([
-        fetch(req),
+        fetch(req, { cache: 'no-cache' }), // selalu cek ke server apakah file berubah
         new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 3000)),
       ]);
       if (res && res.ok) cache.put(req, res.clone());
